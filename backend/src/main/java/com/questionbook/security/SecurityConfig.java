@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .headers(h -> h.frameOptions(f -> f.disable()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/h2-console/**", "/api/share/**","/error").permitAll()
+                        .requestMatchers("/api/auth/**", "/h2-console/**", "/api/share/**","/error","/uploads/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

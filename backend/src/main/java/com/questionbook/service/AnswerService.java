@@ -41,4 +41,15 @@ public class AnswerService {
         Answer saved = answerRepository.save(answer);
         return new AnswerResponse(saved.getId(), saved.getContent(), saved.getImageUrl(), saved.getAnsweredAt(), saved.getUpdatedAt());
     }
+    public AnswerResponse getAnswer(Long questionId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new NoSuchElementException("질문을 찾을 수 없습니다"));
+        String ownerEmail = question.getQuestionSet().getUser().getEmail();
+        if (!ownerEmail.equals(SecurityUtils.getCurrentUserEmail())) {
+            throw new AccessDeniedException("본인의 질문만 조회할 수 있습니다");
+        }
+        return answerRepository.findByQuestionId(questionId)
+                .map(a -> new AnswerResponse(a.getId(), a.getContent(), a.getImageUrl(), a.getAnsweredAt(), a.getUpdatedAt()))
+                .orElse(null);
+    }
 }

@@ -21,4 +21,8 @@ public class AnswerController {
     ) {
         return answerService.saveAnswer(questionId, content, image);
     }
+    @GetMapping
+    public AnswerResponse get(@PathVariable Long questionId) {
+        return answerService.getAnswer(questionId);
+    }
 }
