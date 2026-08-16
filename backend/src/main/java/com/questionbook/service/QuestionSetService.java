@@ -104,6 +104,19 @@ public class QuestionSetService {
                         a.getContent(), a.getImageUrl(), a.getAnsweredAt()
                 ))
                 .toList();
-        return new BookPreviewResponse(set.getId(), entries.size(), entries);
+        return new BookPreviewResponse(set.getId(),set.getUser().getNickname(), entries.size(), entries);
+    }
+
+    public List<QuestionSetSummary> listMySets() {
+        String email = SecurityUtils.getCurrentUserEmail();
+        List<UserQuestionSet> sets = questionSetRepository.findByUser_EmailOrderByCreatedAtDesc(email);
+        return sets.stream().map(set -> {
+            List<Question> questions = questionRepository.findByQuestionSetIdOrderBySortOrder(set.getId());
+            int total = questions.size();
+            int answered = answerRepository.findAnsweredQuestionIds(set.getId()).size();
+            String title = set.getTemplate() != null ? set.getTemplate().getName() : "나만의 질문";
+            String targetType = set.getTemplate() != null ? set.getTemplate().getTargetType() : null;
+            return new QuestionSetSummary(set.getId(), title, targetType, set.getMode(), total, answered, set.getCreatedAt());
+        }).toList();
     }
 }

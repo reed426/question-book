@@ -1,18 +1,22 @@
 package com.questionbook.controller;
 
-import com.questionbook.dto.BookPreviewResponse;
-import com.questionbook.dto.CreateQuestionSetRequest;
-import com.questionbook.dto.ProgressResponse;
-import com.questionbook.dto.QuestionSetResponse;
+import com.questionbook.dto.*;
 import com.questionbook.service.QuestionSetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/question-sets")
 @RequiredArgsConstructor
 public class QuestionSetController {
     private final QuestionSetService questionSetService;
+
+    @GetMapping
+    public List<QuestionSetSummary> list() {
+        return questionSetService.listMySets();
+    }
 
     @PostMapping
     public QuestionSetResponse create(@RequestBody CreateQuestionSetRequest req) {
@@ -32,4 +36,5 @@ public class QuestionSetController {
     public BookPreviewResponse preview(@PathVariable Long id) {
         return questionSetService.getPreview(id);
     }
+
 }

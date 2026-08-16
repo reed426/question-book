@@ -1,5 +1,6 @@
 package com.questionbook.service;
 
+import com.questionbook.dto.AuthResponse;
 import com.questionbook.dto.LoginRequest;
 import com.questionbook.dto.SignupRequest;
 import com.questionbook.entity.User;
@@ -18,7 +19,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public String signup(SignupRequest req) {
+    public AuthResponse signup(SignupRequest req) {
         if (userRepository.findByEmail(req.getEmail()).isPresent()) {
             throw new DuplicateEmailException("이미 가입된 이메일입니다");
         }
@@ -27,15 +28,18 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setNickname(req.getNickname());
         userRepository.save(user);
-        return jwtTokenProvider.createToken(user.getEmail());
+        String token = jwtTokenProvider.createToken(user.getEmail());
+        return new AuthResponse(token, user.getNickname());
     }
 
-    public String login(LoginRequest req) {
+
+    public AuthResponse login(LoginRequest req) {
         User user = userRepository.findByEmail(req.getEmail())
                 .orElseThrow(() -> new InvalidCredentialsException("이메일 또는 비밀번호가 일치하지 않습니다"));
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("이메일 또는 비밀번호가 일치하지 않습니다");
         }
-        return jwtTokenProvider.createToken(user.getEmail());
+        String token = jwtTokenProvider.createToken(user.getEmail());
+        return new AuthResponse(token, user.getNickname());
     }
 }

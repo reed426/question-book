@@ -2,4 +2,4 @@ package com.questionbook.dto;
 
 import java.util.List;
 
-public record BookPreviewResponse(Long questionSetId, int totalAnswered, List<BookEntryResponse> entries) {}
+public record BookPreviewResponse(Long questionSetId, String authorNickname, int totalAnswered, List<BookEntryResponse> entries) {}

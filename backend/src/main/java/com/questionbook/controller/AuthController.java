@@ -1,5 +1,6 @@
 package com.questionbook.controller;
 
+import com.questionbook.dto.AuthResponse;
 import com.questionbook.dto.LoginRequest;
 import com.questionbook.dto.SignupRequest;
 import com.questionbook.service.AuthService;
@@ -20,12 +21,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest req) {
-        return ResponseEntity.ok(Map.of("token", authService.signup(req)));
+    public AuthResponse signup(@RequestBody @Valid SignupRequest req) {
+        return authService.signup(req);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest req) {
-        return ResponseEntity.ok(Map.of("token", authService.login(req)));
+    public AuthResponse login(@RequestBody @Valid LoginRequest req) {
+        return authService.login(req);
     }
 }

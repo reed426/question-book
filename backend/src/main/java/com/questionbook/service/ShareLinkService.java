@@ -56,6 +56,7 @@ public class ShareLinkService {
                 .orElseThrow(() -> new NoSuchElementException("유효하지 않거나 해제된 공유 링크입니다"));
 
         Long questionSetId = link.getQuestionSet().getId();
+        String authorNickname = link.getQuestionSet().getUser().getNickname();
         List<Answer> answers = answerRepository.findByQuestionSetIdOrderByQuestionSortOrder(questionSetId);
         List<BookEntryResponse> entries = answers.stream()
                 .map(a -> new BookEntryResponse(
@@ -63,6 +64,6 @@ public class ShareLinkService {
                         a.getContent(), a.getImageUrl(), a.getAnsweredAt()
                 ))
                 .toList();
-        return new BookPreviewResponse(questionSetId, entries.size(), entries);
+        return new BookPreviewResponse(questionSetId, authorNickname, entries.size(), entries);
     }
 }
