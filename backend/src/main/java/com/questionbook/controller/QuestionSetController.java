@@ -1,6 +1,8 @@
 package com.questionbook.controller;
 
+import com.questionbook.dto.BookPreviewResponse;
 import com.questionbook.dto.CreateQuestionSetRequest;
+import com.questionbook.dto.ProgressResponse;
 import com.questionbook.dto.QuestionSetResponse;
 import com.questionbook.service.QuestionSetService;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +22,14 @@ public class QuestionSetController {
     @GetMapping("/{id}")
     public QuestionSetResponse get(@PathVariable Long id) {
         return questionSetService.get(id);
+    }
+    @GetMapping("/{id}/progress")
+    public ProgressResponse progress(@PathVariable Long id) {
+        return questionSetService.getProgress(id);
+    }
+
+    @GetMapping("/{id}/preview")
+    public BookPreviewResponse preview(@PathVariable Long id) {
+        return questionSetService.getPreview(id);
     }
 }

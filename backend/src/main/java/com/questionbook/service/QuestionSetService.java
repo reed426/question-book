@@ -1,22 +1,15 @@
 package com.questionbook.service;
 
-import com.questionbook.dto.CreateQuestionSetRequest;
-import com.questionbook.dto.QuestionResponse;
-import com.questionbook.dto.QuestionSetResponse;
+import com.questionbook.dto.*;
 import com.questionbook.entity.*;
-import com.questionbook.repository.QuestionPackTemplateRepository;
-import com.questionbook.repository.QuestionRepository;
-import com.questionbook.repository.UserQuestionSetRepository;
-import com.questionbook.repository.UserRepository;
+import com.questionbook.repository.*;
 import com.questionbook.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +18,7 @@ public class QuestionSetService {
     private final QuestionPackTemplateRepository templateRepository;
     private final UserQuestionSetRepository questionSetRepository;
     private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
 
     public QuestionSetResponse create(CreateQuestionSetRequest req) {
         User user = userRepository.findByEmail(SecurityUtils.getCurrentUserEmail())
@@ -61,25 +55,55 @@ public class QuestionSetService {
     }
 
     public QuestionSetResponse get(Long id) {
+        UserQuestionSet set = getOwnedSet(id);
+        List<Question> questions = questionRepository.findByQuestionSetIdOrderBySortOrder(id);
+        return toResponse(set, questions);
+    }
+
+    public ProgressResponse getProgress(Long id) {
+        UserQuestionSet set = getOwnedSet(id);
+        List<Question> questions = questionRepository.findByQuestionSetIdOrderBySortOrder(id);
+        int total = questions.size();
+        int answeredCount = answerRepository.findAnsweredQuestionIds(id).size();
+        int percentage = total == 0 ? 0 : (int) Math.round(answeredCount * 100.0 / total);
+        return new ProgressResponse(total, answeredCount, percentage);
+    }
+
+    private UserQuestionSet getOwnedSet(Long id) {
         UserQuestionSet set = questionSetRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("질문 세트를 찾을 수 없습니다"));
         if (!set.getUser().getEmail().equals(SecurityUtils.getCurrentUserEmail())) {
             throw new AccessDeniedException("본인의 질문 세트만 조회할 수 있습니다");
         }
-        List<Question> questions = questionRepository.findByQuestionSetIdOrderBySortOrder(id);
-        return toResponse(set, questions);
+        return set;
     }
 
     private QuestionSetResponse toResponse(UserQuestionSet set, List<Question> questions) {
+        Set<Long> answeredIds = new HashSet<>(answerRepository.findAnsweredQuestionIds(set.getId()));
         List<QuestionResponse> qrs = questions.stream()
-                .map(q -> new QuestionResponse(q.getId(), q.getSortOrder(), q.getText(), q.isCustom(), isLocked(set, q)))
+                .map(q -> new QuestionResponse(
+                        q.getId(), q.getSortOrder(), q.getText(), q.isCustom(),
+                        isLocked(set, q), answeredIds.contains(q.getId())
+                ))
                 .toList();
         return new QuestionSetResponse(set.getId(), set.getMode(), set.getIntervalDays(), set.getStartDate(), qrs);
     }
 
     private boolean isLocked(UserQuestionSet set, Question q) {
         if (set.getMode() != QuestionMode.PERIODIC) return false;
-        LocalDate unlockDate = set.getStartDate().plusDays((long) (q.getSortOrder()-1) * set.getIntervalDays());
+        LocalDate unlockDate = set.getStartDate().plusDays((long) (q.getSortOrder() - 1) * set.getIntervalDays());
         return LocalDate.now().isBefore(unlockDate);
+    }
+
+    public BookPreviewResponse getPreview(Long id) {
+        UserQuestionSet set = getOwnedSet(id);
+        List<Answer> answers = answerRepository.findByQuestionSetIdOrderByQuestionSortOrder(id);
+        List<BookEntryResponse> entries = answers.stream()
+                .map(a -> new BookEntryResponse(
+                        a.getQuestion().getId(), a.getQuestion().getSortOrder(), a.getQuestion().getText(),
+                        a.getContent(), a.getImageUrl(), a.getAnsweredAt()
+                ))
+                .toList();
+        return new BookPreviewResponse(set.getId(), entries.size(), entries);
     }
 }

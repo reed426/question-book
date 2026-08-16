@@ -34,7 +34,7 @@ public class QuestionService {
         q.setText(req.text());
         q.setCustom(true);
         Question saved = questionRepository.save(q);
-        return new QuestionResponse(saved.getId(), saved.getSortOrder(), saved.getText(), saved.isCustom(), false);
+        return new QuestionResponse(saved.getId(), saved.getSortOrder(), saved.getText(), saved.isCustom(), false, false);
     }
 
     public QuestionResponse updateQuestion(Long questionId, UpdateQuestionRequest req) {
@@ -46,7 +46,7 @@ public class QuestionService {
         if (req.sortOrder() != null) q.setSortOrder(req.sortOrder());
         q.setCustom(true);
         Question saved = questionRepository.save(q);
-        return new QuestionResponse(saved.getId(), saved.getSortOrder(), saved.getText(), saved.isCustom(), false);
+        return new QuestionResponse(saved.getId(), saved.getSortOrder(), saved.getText(), saved.isCustom(), false, false);
     }
 
     public void deleteQuestion(Long questionId) {
