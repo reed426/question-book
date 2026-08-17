@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { QuestionPackTemplateDetail, QuestionSetResponse } from "@/lib/types";
+import Link from "next/link";
+import Header from "@/components/Header";
 
 export default function SetupPage() {
   const params = useParams();
@@ -13,7 +15,13 @@ export default function SetupPage() {
   const [template, setTemplate] = useState<QuestionPackTemplateDetail | null>(null);
   const [mode, setMode] = useState<"FREE" | "PERIODIC">("FREE");
   const [intervalDays, setIntervalDays] = useState(7);
-  const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [startDate, setStartDate] = useState(() => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+});
   const [loading, setLoading] = useState(!isCustom);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -50,7 +58,9 @@ export default function SetupPage() {
   if (loading) return <p>불러오는 중...</p>;
 
   return (
-    <main className="mx-auto max-w-xl px-8 py-16">
+    <>
+    <Header />
+    <main className="mx-auto max-w-xl py-16">
       <h1 className="text-2xl font-bold">{isCustom ? "완전히 새로 만들기" : template?.name}</h1>
 
       <div className="mt-8">
@@ -103,10 +113,15 @@ export default function SetupPage() {
         <div className="mt-8">
           <p className="mb-2 text-sm font-medium">포함된 질문 {template.questions.length}개</p>
           <ul className="space-y-2 text-sm text-gray-500">
-            {template.questions.map((q) => (
+            {template.questions.slice(0, 10).map((q) => (
               <li key={q.id}>· {q.text}</li>
             ))}
           </ul>
+          {template.questions.length > 10 && (
+            <p className="mt-2 text-sm text-gray-400">
+              외 {template.questions.length - 10}개 질문이 더 있어요
+            </p>
+          )}
           <p className="mt-2 text-xs text-gray-400">질문은 다음 화면에서 자유롭게 수정·추가·삭제할 수 있어요.</p>
         </div>
       )}
@@ -121,5 +136,6 @@ export default function SetupPage() {
         {submitting ? "만드는 중..." : "이 질문들로 시작하기"}
       </button>
     </main>
+    </>
   );
 }

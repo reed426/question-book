@@ -30,3 +30,28 @@ export interface QuestionSetResponse {
   startDate: string;
   questions: QuestionResponse[];
 }
+export interface BookEntry {
+  questionId: number;
+  sortOrder: number;
+  questionText: string;
+  content: string;
+  imageUrl: string | null;
+  answeredAt: string;
+}
+
+export interface BookPreviewResponse {
+  questionSetId: number;
+  authorNickname: string;
+  totalAnswered: number;
+  entries: BookEntry[];
+}
+
+export interface QuestionSetSummary {
+  id: number;
+  title: string;
+  targetType: string | null;
+  mode: "FREE" | "PERIODIC";
+  total: number;
+  answered: number;
+  createdAt: string;
+}

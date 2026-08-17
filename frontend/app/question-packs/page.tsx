@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { QuestionPackTemplateSummary } from "@/lib/types";
+import Header from "@/components/Header";
 
 const targetTypeLabel: Record<string, string> = {
   PARTNER: "연인",
@@ -24,13 +25,9 @@ export default function QuestionPacksPage() {
 
   return (
     <>
-      <header className="border-b border-gray-100 px-8 py-5">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
-          question-book
-        </Link>
-      </header>
+      <Header />
 
-      <main className="mx-auto max-w-3xl px-8 py-16">
+      <main className="mx-auto max-w-3xl py-16">
         <p className="text-sm font-medium text-rose-500">질문팩 선택</p>
         <h1 className="mt-2 text-3xl font-bold">누구를 위한 기록인가요?</h1>
         <p className="mt-3 text-gray-500">

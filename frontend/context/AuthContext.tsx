@@ -2,8 +2,13 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { apiFetch } from "@/lib/api";
 
+interface User {
+  nickname: string;
+}
+
 interface AuthContextType {
   token: string | null;
+  user: User | null;
   signup: (email: string, password: string, nickname: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -13,18 +18,28 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    setToken(localStorage.getItem("token"));
+    const savedToken = localStorage.getItem("token");
+    const savedNickname = localStorage.getItem("nickname");
+    if (savedToken) setToken(savedToken);
+    if (savedNickname) setUser({ nickname: savedNickname });
   }, []);
+
+  const saveAuth = (data: { token: string; nickname: string }) => {
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("nickname", data.nickname);
+    setToken(data.token);
+    setUser({ nickname: data.nickname });
+  };
 
   const signup = async (email: string, password: string, nickname: string) => {
     const data = await apiFetch("/api/auth/signup", {
       method: "POST",
       body: JSON.stringify({ email, password, nickname }),
     });
-    localStorage.setItem("token", data.token);
-    setToken(data.token);
+    saveAuth(data);
   };
 
   const login = async (email: string, password: string) => {
@@ -32,17 +47,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    localStorage.setItem("token", data.token);
-    setToken(data.token);
+    saveAuth(data);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("nickname");
     setToken(null);
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ token, signup, login, logout }}>
+    <AuthContext.Provider value={{ token, user, signup, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

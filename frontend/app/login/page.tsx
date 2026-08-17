@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import Header from "@/components/Header";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -28,12 +29,8 @@ export default function LoginPage() {
 
   return (
     <>
-      <header className="border-b border-gray-100 px-8 py-5">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
-          question-book
-        </Link>
-      </header>
-      <main className="mx-auto flex min-h-[calc(100vh-73px)] max-w-sm flex-col justify-center px-8">
+      <Header />
+      <main className="mx-auto flex min-h-[calc(100vh-73px)] max-w-sm flex-col justify-center">
         <h1 className="text-2xl font-bold">로그인</h1>
         <p className="mt-2 text-sm text-gray-500">다시 만나서 반가워요.</p>
 
@@ -73,6 +70,6 @@ export default function LoginPage() {
           </Link>
         </p>
       </main>
-    </>
+      </>
   );
 }

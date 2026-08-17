@@ -13,5 +13,6 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.message ?? "요청에 실패했습니다");
   }
-  return res.json();
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }

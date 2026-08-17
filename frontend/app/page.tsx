@@ -1,20 +1,15 @@
+"use client";
+import Header from "@/components/Header";
+import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
 
 export default function HomePage() {
+  const { user } = useAuth();
+  const ctaHref = user ? "/question-packs" : "/signup";
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      <header className="flex items-center justify-between border-b border-gray-100 px-8 py-5">
-        <span className="text-lg font-semibold tracking-tight">question-book</span>
-        <nav className="flex items-center gap-4 text-sm">
-          <Link href="/login" className="text-gray-600 hover:text-gray-900">
-            로그인
-          </Link>
-          <Link href="/signup" className="rounded-full bg-gray-900 px-4 py-2 text-white hover:bg-gray-700">
-            시작하기
-          </Link>
-        </nav>
-      </header>
+      <Header/>
 
       <section className="relative mx-auto max-w-6xl overflow-hidden px-8 py-16 sm:py-20">
         <div className="absolute -left-20 top-0 -z-10 h-[500px] w-[500px] rounded-full bg-rose-50 blur-3xl" />
@@ -35,7 +30,7 @@ export default function HomePage() {
             </p>
             
             <Link
-              href="/signup"
+              href={ctaHref}
               className="mt-8 inline-block rounded-full bg-gray-900 px-6 py-3 text-white hover:bg-gray-700"
             >
               질문 받으러 가기
