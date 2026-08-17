@@ -1,6 +1,7 @@
 # Question-book
 
 질문에 답하며 나 자신, 혹은 연인·가족 같은 소중한 사람에 대한 기록을 쌓아가는 서비스입니다.
+![메인 화면](docs/images/Question_book.png)
 
 ## 어떤 서비스인가요
 
