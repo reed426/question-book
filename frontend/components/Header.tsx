@@ -16,6 +16,9 @@ export default function Header() {
           <Link href="/my" className="text-gray-600 hover:text-gray-900">
             내 질문북
           </Link>
+          <Link href="/notifications" className="text-gray-600 hover:text-gray-900">
+            알림
+          </Link>
             <span className="text-gray-600 font-semibold">{user.nickname}님</span>
             <button onClick={logout} className="text-gray-500 hover:text-gray-900">
               로그아웃

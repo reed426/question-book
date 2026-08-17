@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { apiFetch } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 interface User {
   nickname: string;
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -55,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("nickname");
     setToken(null);
     setUser(null);
+    router.push("/");
   };
 
   return (

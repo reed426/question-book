@@ -55,3 +55,31 @@ export interface QuestionSetSummary {
   answered: number;
   createdAt: string;
 }
+
+export interface NotificationItem {
+  questionSetId: number;
+  questionSetTitle: string;
+  questionId: number;
+  questionText: string;
+}
+
+export interface TemplateUsage {
+  templateName: string;
+  count: number;
+}
+
+export interface AdminStatsResponse {
+  totalUsers: number;
+  totalQuestionSets: number;
+  totalAnswers: number;
+  averageCompletionRate: number;
+  templateUsage: TemplateUsage[];
+}
+
+export interface CustomQuestionAdminView {
+  questionId: number;
+  text: string;
+  authorNickname: string;
+  questionSetTitle: string;
+  createdAt: string;
+}
