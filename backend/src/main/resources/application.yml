@@ -26,7 +26,3 @@ jwt:
   secret: change-this-to-a-long-random-string-later
   expiration: 86400000
 
-
-logging:
-  level:
-    org.springframework.security: DEBUG
