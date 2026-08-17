@@ -52,13 +52,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     saveAuth(data);
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("nickname");
-    setToken(null);
-    setUser(null);
-    router.push("/");
-  };
+  const logout = async () => {
+  try {
+    await apiFetch("/api/auth/logout", { method: "POST" });
+  } catch {
+  }
+  localStorage.removeItem("token");
+  localStorage.removeItem("nickname");
+  setToken(null);
+  setUser(null);
+  router.push("/");
+};
 
   return (
     <AuthContext.Provider value={{ token, user, signup, login, logout }}>

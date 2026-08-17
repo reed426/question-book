@@ -101,7 +101,7 @@ export default function PreviewPage() {
         <div className="mt-16 border-t border-gray-100 pt-8 text-center">
           {shareLink ? (
             <div>
-              <p className="text-sm text-gray-500">이 링크로 공유할 수 있어요</p>
+              <p className="text-sm text-gray-500">이 링크로 공유할 수 있어요 (30일간 유효)</p>
               <p className="mt-2 break-all rounded-lg bg-gray-50 px-4 py-3 text-sm">{shareLink}</p>
             </div>
           ) : (
