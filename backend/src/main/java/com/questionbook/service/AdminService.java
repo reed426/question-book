@@ -1,6 +1,7 @@
 package com.questionbook.service;
 
 import com.questionbook.dto.AdminStatsResponse;
+import com.questionbook.dto.CustomQuestionAdminView;
 import com.questionbook.dto.TemplateUsage;
 import com.questionbook.entity.UserQuestionSet;
 import com.questionbook.repository.AnswerRepository;
@@ -40,5 +41,17 @@ public class AdminService {
                 .toList();
 
         return new AdminStatsResponse(totalUsers, totalQuestionSets, totalAnswers, averageCompletionRate, templateUsage);
+    }
+
+    public List<CustomQuestionAdminView> getRecentCustomQuestions() {
+        return questionRepository.findTop50ByIsCustomTrueOrderByCreatedAtDesc().stream()
+                .map(q -> {
+                    UserQuestionSet set = q.getQuestionSet();
+                    String title = set.getTemplate() != null ? set.getTemplate().getName() : "나만의 질문";
+                    return new CustomQuestionAdminView(
+                            q.getId(), q.getText(), set.getUser().getNickname(), title, q.getCreatedAt()
+                    );
+                })
+                .toList();
     }
 }
