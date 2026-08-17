@@ -28,7 +28,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setNickname(req.getNickname());
         userRepository.save(user);
-        String token = jwtTokenProvider.createToken(user.getEmail());
+        String token = jwtTokenProvider.createToken(user.getEmail(),user.getRole());
         return new AuthResponse(token, user.getNickname());
     }
 
@@ -39,7 +39,7 @@ public class AuthService {
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("이메일 또는 비밀번호가 일치하지 않습니다");
         }
-        String token = jwtTokenProvider.createToken(user.getEmail());
+        String token = jwtTokenProvider.createToken(user.getEmail(),user.getRole());
         return new AuthResponse(token, user.getNickname());
     }
 }

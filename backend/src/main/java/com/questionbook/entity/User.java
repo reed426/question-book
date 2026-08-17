@@ -21,5 +21,7 @@ public class User {
     @Column(nullable = false)
     private String password;
     private String nickname;
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
     private LocalDateTime createdAt = LocalDateTime.now();
 }
