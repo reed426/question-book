@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -36,8 +37,9 @@ public class ShareLinkService {
         link.setQuestionSet(set);
         link.setToken(UUID.randomUUID().toString());
         link.setActive(true);
+        link.setExpiresAt(LocalDateTime.now().plusDays(30));
         ShareLink saved = shareLinkRepository.save(link);
-        return new ShareLinkResponse(saved.getId(), saved.getToken(), saved.isActive());
+        return new ShareLinkResponse(saved.getId(), saved.getToken(), saved.isActive(),saved.getExpiresAt());
     }
 
     public void deactivate(Long shareLinkId) {
@@ -53,6 +55,7 @@ public class ShareLinkService {
     public BookPreviewResponse getSharedPreview(String token) {
         ShareLink link = shareLinkRepository.findByToken(token)
                 .filter(ShareLink::isActive)
+                .filter(l -> l.getExpiresAt() == null || l.getExpiresAt().isAfter(LocalDateTime.now()))
                 .orElseThrow(() -> new NoSuchElementException("유효하지 않거나 해제된 공유 링크입니다"));
 
         Long questionSetId = link.getQuestionSet().getId();

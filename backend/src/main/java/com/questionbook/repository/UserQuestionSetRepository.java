@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface UserQuestionSetRepository extends JpaRepository<UserQuestionSet, Long> {
     List<UserQuestionSet> findByUser_EmailOrderByCreatedAtDesc(String email);
+    long countByUser_Email(String email);
 }

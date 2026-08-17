@@ -37,4 +37,9 @@ public class GlobalExceptionHandler {
                 .body(Map.of("message", "사진 용량이 너무 큽니다. 20MB 이하로 올려주세요."));
     }
 
+    @ExceptionHandler(LimitExceededException.class)
+    public ResponseEntity<?> handleLimitExceeded(LimitExceededException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+    }
+
 }

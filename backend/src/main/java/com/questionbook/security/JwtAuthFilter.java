@@ -18,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenBlacklist tokenBlacklist;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -25,7 +26,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-            if (jwtTokenProvider.validate(token)) {
+            if (jwtTokenProvider.validate(token) && !tokenBlacklist.isRevoked(jwtTokenProvider.getJti(token))) {
                 String email = jwtTokenProvider.getEmail(token);
                 String role = jwtTokenProvider.getRole(token);
                 var authorities = List.of(new SimpleGrantedAuthority("ROLE_"+ role));

@@ -2,6 +2,7 @@ package com.questionbook.service;
 
 import com.questionbook.dto.*;
 import com.questionbook.entity.*;
+import com.questionbook.exception.LimitExceededException;
 import com.questionbook.repository.*;
 import com.questionbook.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,9 +22,15 @@ public class QuestionSetService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
 
+    private static final int MAX_QUESTION_SETS_PER_USER = 20;
     public QuestionSetResponse create(CreateQuestionSetRequest req) {
         User user = userRepository.findByEmail(SecurityUtils.getCurrentUserEmail())
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
+
+        long currentCount = questionSetRepository.countByUser_Email(user.getEmail());
+        if (currentCount >= MAX_QUESTION_SETS_PER_USER) {
+            throw new LimitExceededException("질문북은 최대 " + MAX_QUESTION_SETS_PER_USER + "개까지 만들 수 있어요.");
+        }
 
         UserQuestionSet set = new UserQuestionSet();
         set.setUser(user);
@@ -110,12 +118,19 @@ public class QuestionSetService {
     public List<QuestionSetSummary> listMySets() {
         String email = SecurityUtils.getCurrentUserEmail();
         List<UserQuestionSet> sets = questionSetRepository.findByUser_EmailOrderByCreatedAtDesc(email);
+        List<Long> setIds = sets.stream().map(UserQuestionSet::getId).toList();
+
+        Map<Long, Long> totalBySet = questionRepository.findByQuestionSetIdIn(setIds).stream()
+                .collect(Collectors.groupingBy(q -> q.getQuestionSet().getId(), Collectors.counting()));
+
+        Map<Long, Long> answeredBySet = answerRepository.findByQuestionSetIds(setIds).stream()
+                .collect(Collectors.groupingBy(a -> a.getQuestion().getQuestionSet().getId(), Collectors.counting()));
+
         return sets.stream().map(set -> {
-            List<Question> questions = questionRepository.findByQuestionSetIdOrderBySortOrder(set.getId());
-            int total = questions.size();
-            int answered = answerRepository.findAnsweredQuestionIds(set.getId()).size();
             String title = set.getTemplate() != null ? set.getTemplate().getName() : "나만의 질문";
             String targetType = set.getTemplate() != null ? set.getTemplate().getTargetType() : null;
+            int total = totalBySet.getOrDefault(set.getId(), 0L).intValue();
+            int answered = answeredBySet.getOrDefault(set.getId(), 0L).intValue();
             return new QuestionSetSummary(set.getId(), title, targetType, set.getMode(), total, answered, set.getCreatedAt());
         }).toList();
     }

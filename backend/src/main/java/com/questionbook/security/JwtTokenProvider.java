@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtTokenProvider {
@@ -28,8 +29,9 @@ public class JwtTokenProvider {
     public String createToken(String email, Role role) {
         Date now = new Date();
         return Jwts.builder()
+                .setId(UUID.randomUUID().toString())
                 .setSubject(email)
-                .claim("role",role.name())
+                .claim("role", role.name())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + expiration))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -52,5 +54,10 @@ public class JwtTokenProvider {
 
     public String getRole(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("role",String.class);
+    }
+
+    public String getJti(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token).getBody().getId();
     }
 }

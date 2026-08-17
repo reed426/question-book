@@ -20,6 +20,7 @@ public class ShareLink {
     private UserQuestionSet questionSet;
     @Column(unique = true, nullable = false)
     private String token;
+    private LocalDateTime expiresAt;
     private boolean isActive = true;
     private LocalDateTime createdAt = LocalDateTime.now();
 }
