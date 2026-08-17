@@ -156,3 +156,7 @@ INSERT INTO template_question (id, template_id, sort_order, text) VALUES
 (148, 3, 48, '앞으로 1년 동안 꼭 지키고 싶은 약속이 있다면 무엇일까?'),
 (149, 3, 49, '내가 앞으로 더 많이 사랑해주고 싶은 것은 무엇일까?'),
 (150, 3, 50, '오늘의 나에게 따뜻한 편지를 쓴다면 어떤 말을 해주고 싶을까?');
+
+INSERT INTO users (id, email, password, nickname, created_at, role) VALUES
+                                                                        (1, 'admin@questionbook.com', '$2b$10$j239RuemNoRdhptACvPjc.NpBtZBcG29OP17b71wse2XpcnsgIwK.', '관리자', CURRENT_TIMESTAMP, 'ADMIN'),
+                                                                        (2, 'demo@questionbook.com', '$2b$10$pvy8W5QWT9xccZUZwVUKh.W78SIi4fV/UsbPgD49MPxPwT1nTieim', '데모유저', CURRENT_TIMESTAMP, 'USER');
